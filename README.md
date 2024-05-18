@@ -1,5 +1,13 @@
 # Self-Supervised Super-Resolution for Multi-Exposure Push-Frame Satellites (CVPR 2022)
 
+
+# Self Notes : 
+- Pre-training FNet model and testing the pretrained_FNet.tar.pth file and our checkpoints :
+  ![image](https://github.com/Jatin7385/HDR-DSP-SR/assets/73430464/189bef3c-1d68-4d4f-86b8-26e730c31390)
+
+
+
+
 [HDR-DSP](https://openaccess.thecvf.com/content/CVPR2022/papers/Nguyen_Self-Supervised_Super-Resolution_for_Multi-Exposure_Push-Frame_Satellites_CVPR_2022_paper.pdf) is the first joint super-resolution and HDR neural network for push-frame satellites. HDR-DSP can be trained on real data thanks to self-supervised learning.
 
 ### Quick start

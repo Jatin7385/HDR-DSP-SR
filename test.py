@@ -21,6 +21,7 @@ from warpingOperator import WarpedLoss, TVL1, base_detail_decomp, BlurLayer
 import os
 from torch.autograd import Variable
 from torchvision.transforms import GaussianBlur
+from do_shift_interp import do_shift_interp
 
 
 def safe_mkdir(path):
@@ -116,10 +117,17 @@ def DeepSaaSuperresolve_weighted_base(samplesLR, flow, base, Encoder, Decoder, d
 
 class SkySatRealDataset_ME(Dataset):
     def __init__(self, path, augmentation = False,  phase = 'train', normalization = 3400., num_images = 15):
-        self.expotime = torch.from_numpy(np.load(os.path.join(path, '{}'.format(phase), str(num_images), '{}Ratio.npy'.format(phase)))[...,None,None])
-        self.data = torch.from_numpy(np.load(os.path.join(path, '{}'.format(phase), str(num_images), '{}LR.npy'.format(phase)))/normalization)
+        # self.expotime = torch.from_numpy(np.load(os.path.join(path, '{}'.format(phase), str(num_images), '{}Ratio.npy'.format(phase)))[...,None,None])
+        # self.data = torch.from_numpy(np.load(os.path.join(path, '{}'.format(phase), str(num_images), '{}LR.npy'.format(phase)))/normalization)
 
-            
+
+        self.expotime = torch.from_numpy(np.load(os.path.join(path, '{}'.format(phase), str(4), '{}Ratio.npy'.format(phase)))[...,None,None])
+        self.data = torch.from_numpy(np.load(os.path.join(path, '{}'.format(phase), str(4), '{}LR.npy'.format(phase)))/normalization)
+
+        self.data = self.data[:,:,:num_images]
+        self.expotime = self.expotime[:num_images, :,:]
+
+
         self.len = self.expotime.size()[0]
         self.augmentation = augmentation
         self.num_images = num_images
@@ -147,8 +155,12 @@ class SkySatRealDataset_ME(Dataset):
         return data
 
     def __getitem__(self, idx):
-        data = self.data[idx]
-        expotime = self.expotime[idx]
+        # data = self.data[idx]
+        # expotime = self.expotime[idx]
+
+        data = self.data
+        expotime = self.expotime
+
         if self.augmentation:
             data = self.transform(data)
         return data, expotime
@@ -181,7 +193,12 @@ def test(args):
     nb_mode = len(feature_mode)
     print(feature_mode)
 
-    checkpoint = torch.load("checkpoint.pth.tar", map_location=torch.device('cpu'))
+    # checkpoint = torch.load("checkpoint.pth.tar", map_location=torch.device('cpu'))
+
+    # checkpoint = torch.load("./TrainHistory/Real_['Avg', 'Max', 'Std']_N2N_FNet_ME_deconv_DetaAtte_W_JS_V_noisy_valvar_time_06-07-07-20-58/checkpoint_1700.pth.tar", map_location=torch.device('cpu'))
+
+    checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']_Pretrained_Fnet/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
+
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
@@ -200,10 +217,13 @@ def test(args):
     warping = WarpedLoss(interpolation = 'bicubicTorch') 
     ##################
     
-    Dataset_path = 'SkySat_ME_noSaturation/'
+    # Dataset_path = 'SkySat_ME_noSaturation/'
+    Dataset_path = "/mnt/c/Users/Jatin/Desktop/Engineering/ISRO Internship/WORK/HDR-DSP-SR-main (1)/HDR-DSP-SR-main/data/hdr-dsp-real-dataset/"# Linux based path
+    # Dataset_path = "C:/Users/Jatin/Desktop/Engineering/ISRO Internship/WORK/HDR-DSP-SR-main (1)/HDR-DSP-SR-main/data/hdr-dsp-real-dataset/"
     test_loader = {}
          
-    for i in range(4,16):
+    # for i in range(4,16):
+    for i in range(2,3):
         transformedDataset = SkySatRealDataset_ME(Dataset_path, augmentation = False, phase = 'test', num_images = i)
         test_loader[str(i)] = torch.utils.data.DataLoader(transformedDataset, batch_size=val_bs, 
                                            num_workers=1, shuffle=False)
@@ -214,13 +234,18 @@ def test(args):
     Encoder.eval()
 
     with torch.no_grad():
-        for n in range(4,16):
-            savepath = "Results/{}".format(n)
+        # for n in range(4,16):
+        for n in range(2,3):
+            # savepath = "Results/{}".format(n)
+            savepath = "Results/{}".format(4)
             safe_mkdir(savepath)
             for k, (samplesLR, expotime) in enumerate(test_loader[str(n)]):
-
+                plt.imshow(samplesLR[0,:,:,0])
+                plt.savefig("./Results/sampleLR.png")
+                # plt.show()
                 samplesLR = samplesLR.float().to(device)
-
+                # samplesLR = samplesLR.view()
+                samplesLR = samplesLR.permute(0, 3, 1, 2)
                 b, num_im, h, w = samplesLR.shape
                 expotime = expotime.float().to(device)
 
@@ -240,6 +265,20 @@ def test(args):
 
                 SR = SR.detach().cpu().numpy().squeeze()
                 np.save(os.path.join(savepath,"SR_{:02d}.npy".format(k)), SR)
+
+                out_bic = do_shift_interp(samplesLR[0,0,:,:].cpu().detach().numpy(), None, None, sr_ratio)
+
+                fig, ax = plt.subplots(1,2,sharex = True, sharey = True)
+                ax[0].imshow(out_bic, cmap = "gray")
+                ax[0].set_title("Bicubic Interpolation")
+                
+                ax[1].imshow(SR, cmap = "gray")
+                ax[1].set_title("Super Resolved")
+            
+                plt.savefig(os.path.join("./Results/plot_pre_trained_fnet_trained_checkpoint.png"))
+                np.save(os.path.join(savepath,"bicubic.npy"), out_bic)
+
+                break
 
 
 def check(args):

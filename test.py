@@ -193,11 +193,18 @@ def test(args):
     nb_mode = len(feature_mode)
     print(feature_mode)
 
+    # For testing, we are going to be taking the pretrained FNet given by authors and pretrained FNet by us, to see how it performs for both. This is to compare if our FNet is being trained correctly.
+    # Fnet_checkpoint = torch.load("pretrained_Fnet.pth.tar", map_location=torch.device('cpu')) # Authors pretrained checkpoint
+    # Fnet_checkpoint = torch.load("./TrainHistory/FNet_time_05-17-02-25-07/checkpoint_4800.pth.tar", map_location=torch.device('cpu')) # Our pretrained Fnet checkpoint
+    
+
     # checkpoint = torch.load("checkpoint.pth.tar", map_location=torch.device('cpu'))
 
     # checkpoint = torch.load("./TrainHistory/Real_['Avg', 'Max', 'Std']_N2N_FNet_ME_deconv_DetaAtte_W_JS_V_noisy_valvar_time_06-07-07-20-58/checkpoint_1700.pth.tar", map_location=torch.device('cpu'))
 
-    checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']_Pretrained_Fnet/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
+    checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
+
+    # checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']_Pretrained_Fnet/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
 
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -209,7 +216,8 @@ def test(args):
 
     Decoder.load_state_dict(checkpoint['state_dictDecoder']) 
     Encoder.load_state_dict(checkpoint['state_dictEncoder']) 
-    Fnet.load_state_dict(checkpoint['state_dictFnet']) 
+    Fnet.load_state_dict(checkpoint['state_dictFnet']) # Normally
+    # Fnet.load_state_dict(Fnet_checkpoint['state_dictFnet']) # For FNet pretrained checkpoint check
 
     gaussian_filter = GaussianBlur(11, sigma=1).to(device)
 
@@ -276,6 +284,7 @@ def test(args):
                 ax[1].set_title("Super Resolved")
             
                 plt.savefig(os.path.join("./Results/plot_pre_trained_fnet_trained_checkpoint.png"))
+                plt.show()
                 np.save(os.path.join(savepath,"bicubic.npy"), out_bic)
 
                 break

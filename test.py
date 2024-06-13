@@ -198,13 +198,23 @@ def test(args):
     # Fnet_checkpoint = torch.load("./TrainHistory/FNet_time_05-17-02-25-07/checkpoint_4800.pth.tar", map_location=torch.device('cpu')) # Our pretrained Fnet checkpoint
     
 
-    # checkpoint = torch.load("checkpoint.pth.tar", map_location=torch.device('cpu'))
+    # Author provided Checkpoint
+    # checkpoint = torch.load("checkpoint.pth.tar", map_location=torch.device('cpu')) 
 
+
+    # Our Trained HDR-DSP with our pre-trained Fnet(Old)
     # checkpoint = torch.load("./TrainHistory/Real_['Avg', 'Max', 'Std']_N2N_FNet_ME_deconv_DetaAtte_W_JS_V_noisy_valvar_time_06-07-07-20-58/checkpoint_1700.pth.tar", map_location=torch.device('cpu'))
 
-    checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
+    # Our Trained HDR-DSP with our pre-trained Fnet(New) 
+    checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']_Our_Pretrained_Fnet/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
 
-    # checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']_Pretrained_Fnet/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
+
+    # Our Trained HDR-DSP with our pre-trained Fnet(Old) 
+    # checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
+
+
+    # Our trained HDR-DSP with Pretrained FNet by Authors
+    # checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']_Pretrained_Fnet/checkpoint_1700.pth.tar", map_location=torch.device('cpu'))
 
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

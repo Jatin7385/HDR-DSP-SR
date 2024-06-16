@@ -100,7 +100,8 @@ val_bs = 20
 #criterion = nn.L1Loss()
 epochs = 5000
 warping = WarpedLoss(p, interpolation = interpolation)
-TVLoss = TVL1(TVLoss_weight=1)
+# TVLoss = TVL1(TVLoss_weight=1)
+TVLoss = TVL1(TVLoss_weight=TVLoss_weight)
 losstype = 'Detail'
 error = 0
 def train():

@@ -206,7 +206,7 @@ def test(args):
     # checkpoint = torch.load("./TrainHistory/Real_['Avg', 'Max', 'Std']_N2N_FNet_ME_deconv_DetaAtte_W_JS_V_noisy_valvar_time_06-07-07-20-58/checkpoint_1700.pth.tar", map_location=torch.device('cpu'))
 
     # Our Trained HDR-DSP with our pre-trained Fnet(New) 
-    checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']_Our_Pretrained_Fnet/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
+    # checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']_Our_Pretrained_Fnet/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
 
 
     # Our Trained HDR-DSP with our pre-trained Fnet(Old) 
@@ -214,7 +214,7 @@ def test(args):
 
 
     # Our trained HDR-DSP with Pretrained FNet by Authors
-    # checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']_Pretrained_Fnet/checkpoint_1700.pth.tar", map_location=torch.device('cpu'))
+    checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']_Pretrained_Fnet/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
 
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -236,8 +236,10 @@ def test(args):
     ##################
     
     # Dataset_path = 'SkySat_ME_noSaturation/'
-    Dataset_path = "/mnt/c/Users/Jatin/Desktop/Engineering/ISRO Internship/WORK/HDR-DSP-SR-main (1)/HDR-DSP-SR-main/data/hdr-dsp-real-dataset/"# Linux based path
-    # Dataset_path = "C:/Users/Jatin/Desktop/Engineering/ISRO Internship/WORK/HDR-DSP-SR-main (1)/HDR-DSP-SR-main/data/hdr-dsp-real-dataset/"
+    # try:
+    #     Dataset_path = "/mnt/c/Users/Jatin/Desktop/Engineering/ISRO Internship/WORK/HDR-DSP-SR-main (1)/HDR-DSP-SR-main/data/hdr-dsp-real-dataset/"# Linux based path
+    # except Exception as e:
+    Dataset_path = "C:/Users/Jatin/Desktop/Engineering/ISRO Internship/WORK/HDR-DSP-SR-main (1)/HDR-DSP-SR-main/data/hdr-dsp-real-dataset/"
     test_loader = {}
          
     # for i in range(4,16):

@@ -12,7 +12,7 @@ import pandas as pd
 
 
 
-path = "./TrainHistory/FNet_Pretraining_Testing/loss_checkpoints.csv"
+path = "./TrainHistory/FNet_Pretraining_Testing/loss_checkpoints2600.csv"
 # files = os.listdir(path)
 
 # for file in files:
@@ -22,12 +22,20 @@ df = pd.read_csv(path)
 
 loss = []
 epochs = []
+minEpoch = 0
 for i in range(len(df)):
     print(df.loc[i])
-    loss.append(df.loc[i]['TrainLoss'])
+    # if(df.loc[i]["ValWarpLoss"] == 0.1530012406874448):
+    #     minEpoch = df.loc[i]['Epoch']
+    loss.append(df.loc[i]['ValLoss'])
     epochs.append(df.loc[i]['Epoch'])
 
+print("Minimum Loss reached : " , np.min(np.array(loss)))
+print("Epoch at which occured : " , minEpoch)
 plt.plot(epochs, loss)
+plt.xlabel("Epochs")
+plt.ylabel("ValLoss")
+plt.title("FNet Pretraining Loss vs Epochs")
 plt.show()
 
 

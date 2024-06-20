@@ -195,7 +195,7 @@ def test(args):
 
     # For testing, we are going to be taking the pretrained FNet given by authors and pretrained FNet by us, to see how it performs for both. This is to compare if our FNet is being trained correctly.
     # Fnet_checkpoint = torch.load("pretrained_Fnet.pth.tar", map_location=torch.device('cpu')) # Authors pretrained checkpoint
-    # Fnet_checkpoint = torch.load("./TrainHistory/FNet_time_05-17-02-25-07/checkpoint_4800.pth.tar", map_location=torch.device('cpu')) # Our pretrained Fnet checkpoint
+    Fnet_checkpoint = torch.load("./TrainHistory/FNet_Pretraining_Testing/checkpoint_50000.pth.tar", map_location=torch.device('cpu')) # Our pretrained Fnet checkpoint
     
 
     # Author provided Checkpoint
@@ -226,8 +226,8 @@ def test(args):
 
     Decoder.load_state_dict(checkpoint['state_dictDecoder']) 
     Encoder.load_state_dict(checkpoint['state_dictEncoder']) 
-    Fnet.load_state_dict(checkpoint['state_dictFnet']) # Normally
-    # Fnet.load_state_dict(Fnet_checkpoint['state_dictFnet']) # For FNet pretrained checkpoint check
+    # Fnet.load_state_dict(checkpoint['state_dictFnet']) # Normally
+    Fnet.load_state_dict(Fnet_checkpoint['state_dictFnet']) # For FNet pretrained checkpoint check
 
     gaussian_filter = GaussianBlur(11, sigma=1).to(device)
 

@@ -190,6 +190,10 @@ def BicubicWarping(x, flo, device, ds_factor = 2):
         #grid = grid.cuda()
                 #print(grid.shape)
         vgrid = ds_factor*(Variable(grid) + flo)
+
+        # x values = 2*x values / max(downsampling_factor*Width - 1, 1) - 1.0
+
+
         vgrid[:,0,:,:] = 2.0*vgrid[:,0,:,:].clone() / max(ds_factor*W-1,1)-1.0
         vgrid[:,1,:,:] = 2.0*vgrid[:,1,:,:].clone() / max(ds_factor*H-1,1)-1.0
 

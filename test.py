@@ -56,6 +56,8 @@ def flowEstimation(samplesLR, ME, device, gaussian_filter , warping, sr_ratio = 
 
     flow[::num_im] = 0
 
+    print(samplesLRblur.shape, samplesLR_0.shape, flow.shape)
+
     warploss, _ = warping(samplesLRblur.unsqueeze(1).to(device),samplesLR_0.unsqueeze(1).to(device), flow, losstype = 'Detail')
 
     return flow.reshape(b, num_im, 2, h, w), warploss
@@ -195,13 +197,13 @@ def test(args):
 
     # For testing, we are going to be taking the pretrained FNet given by authors and pretrained FNet by us, to see how it performs for both. This is to compare if our FNet is being trained correctly.
     # Fnet_checkpoint = torch.load("pretrained_Fnet.pth.tar", map_location=torch.device('cpu')) # Authors pretrained checkpoint
-    Fnet_checkpoint = torch.load("./TrainHistory/FNet_Pretraining_Testing/checkpoint_50000.pth.tar", map_location=torch.device('cpu')) # Our pretrained Fnet checkpoint
+    # Fnet_checkpoint = torch.load("./TrainHistory/FNet_Pretraining_Testing/checkpoint_50000.pth.tar", map_location=torch.device('cpu')) # Our pretrained Fnet checkpoint
     
 
     # Author provided Checkpoint
     # checkpoint = torch.load("checkpoint.pth.tar", map_location=torch.device('cpu')) 
 
-
+    
     # Our Trained HDR-DSP with our pre-trained Fnet(Old)
     # checkpoint = torch.load("./TrainHistory/Real_['Avg', 'Max', 'Std']_N2N_FNet_ME_deconv_DetaAtte_W_JS_V_noisy_valvar_time_06-07-07-20-58/checkpoint_1700.pth.tar", map_location=torch.device('cpu'))
 
@@ -216,6 +218,12 @@ def test(args):
     # Our trained HDR-DSP with Pretrained FNet by Authors
     checkpoint = torch.load("./TrainHistory/Real_['Avg','Max','Std']_Pretrained_Fnet/checkpoint_300.pth.tar", map_location=torch.device('cpu'))
 
+    # Our trained HDR-DSP with Our trained FNet(1400 epochs) and (300 epochs for HDR-DSP)
+    # checkpoint = torch.load("./TrainHistory/Real_Training_Pretraining_Testing/checkpoint_300.pth.tar", map_location = torch.device('cpu'))
+
+    # Our trained HDR-DSP(300 epochs) on Our trained FNet(800 epochs)checkpoint   
+    # checkpoint = torch.load("./TrainHistory/Real_Training_Pretraining_Testing/checkpoint_300_second_run.pth.tar")
+
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
@@ -226,8 +234,8 @@ def test(args):
 
     Decoder.load_state_dict(checkpoint['state_dictDecoder']) 
     Encoder.load_state_dict(checkpoint['state_dictEncoder']) 
-    # Fnet.load_state_dict(checkpoint['state_dictFnet']) # Normally
-    Fnet.load_state_dict(Fnet_checkpoint['state_dictFnet']) # For FNet pretrained checkpoint check
+    Fnet.load_state_dict(checkpoint['state_dictFnet']) # Normally
+    # Fnet.load_state_dict(Fnet_checkpoint['state_dictFnet']) # For FNet pretrained checkpoint check
 
     gaussian_filter = GaussianBlur(11, sigma=1).to(device)
 
@@ -237,9 +245,9 @@ def test(args):
     
     # Dataset_path = 'SkySat_ME_noSaturation/'
     # try:
-    #     Dataset_path = "/mnt/c/Users/Jatin/Desktop/Engineering/ISRO Internship/WORK/HDR-DSP-SR-main (1)/HDR-DSP-SR-main/data/hdr-dsp-real-dataset/"# Linux based path
+    # Dataset_path = "/mnt/c/Users/Jatin/Desktop/Engineering/ISRO Internship/WORK/HDR-DSP-SR-main (1)/HDR-DSP-SR-main/data/hdr-dsp-real-dataset/"# Linux based path
     # except Exception as e:
-    Dataset_path = "C:/Users/Jatin/Desktop/Engineering/ISRO Internship/WORK/HDR-DSP-SR-main (1)/HDR-DSP-SR-main/data/hdr-dsp-real-dataset/"
+    Dataset_path = "C:/Users/Jatin/Desktop/Engineering/ISRO Internship/WORK/HDR-DSP-SR-main (1)/HDR-DSP-SR-main/data/hdr-dsp-real-dataset/"#NEW_ARCHITECTURE/HDR-DSP-SR-main/SkySat_ME_noSaturation/"
     test_loader = {}
          
     # for i in range(4,16):
@@ -253,6 +261,57 @@ def test(args):
     Decoder.eval()
     Encoder.eval()
 
+    # For custom image : 
+    # with torch.no_grad():
+    #     expotime = (torch.from_numpy(np.load(Dataset_path + "test/14/testRatio.npy"))[...,None,None])
+    #     samplesLR = (torch.from_numpy(np.load(Dataset_path + "test/14/testLR.npy")/3400.0))
+
+    #     print(samplesLR.shape, expotime.shape)
+    #     samplesLR = samplesLR[:,:,:]
+    #     expotime = expotime[:,:,:]
+
+    #     samplesLR = samplesLR.float().to(device)
+    #     # samplesLR = samplesLR.view()
+    #     # samplesLR = samplesLR.permute(0, 3, 1, 2)
+    #     b, num_im, h, w = samplesLR.shape
+        
+    #     expotime = expotime.float().to(device)
+
+    #     print(samplesLR.shape, expotime.shape)
+    #     #######Flow
+    #     flow, valwarploss = flowEstimation(samplesLR/expotime*3.4, ME=Fnet, gaussian_filter = gaussian_filter, warping = warping, device=device) 
+
+    #     base, detail = base_detail_decomp(samplesLR/expotime, gaussian_filter) 
+
+    #     # SR for the detail
+    #     SR_detail = DeepSaaSuperresolve_weighted_base(detail, flow=flow, base = samplesLR, Encoder=Encoder, Decoder=Decoder,
+    #                             device = device, feature_mode= feature_mode, num_features = num_features, sr_ratio=sr_ratio, phase = 'validation')
+
+    #     # SR for the base
+    #     SR_base = zoombase_weighted(base, expotime, flow, device, warping)
+
+    #     SR = SR_base + SR_detail
+
+    #     SR = SR.detach().cpu().numpy().squeeze()
+    #     # np.save(os.path.join(savepath,"SR_{:02d}.npy".format(k)), SR)
+
+        
+    #     out_bic = do_shift_interp(samplesLR[0,0,:,:].cpu().detach().numpy(), None, None, sr_ratio)
+
+    #     print(SR.shape)
+
+    #     fig, ax = plt.subplots(1,2,sharex = True, sharey = True)
+    #     ax[0].imshow(out_bic, cmap = "gray")
+    #     ax[0].set_title("Bicubic Interpolation")
+        
+    #     ax[1].imshow(SR, cmap = "gray")
+    #     ax[1].set_title("Super Resolved")
+    #     plt.show()
+
+
+
+
+# '''
     with torch.no_grad():
         # for n in range(4,16):
         for n in range(2,3):
@@ -300,6 +359,8 @@ def test(args):
                 np.save(os.path.join(savepath,"bicubic.npy"), out_bic)
 
                 break
+
+# '''
 
 
 def check(args):

@@ -13,7 +13,7 @@ import pandas as pd
 
 
 # path = "./TrainHistory/FNet_Pretraining_Testing/loss_checkpoints_to_800_with_checkpoints.csv"
-path = "./TrainHistory/AWF_SR_Training/loss_checkpoints.csv"
+path = "./TrainHistory/AWF_SR_Training/loss_checkpoints_110_epochs.csv"
 # files = os.listdir(path)
 
 # for file in files:
